@@ -77,6 +77,7 @@ namespace FMaj.CapcomDirectServer.States
                 case 0x7E01:
                     client.SendMessage(ServerOpcodes.SetUserMoney, BitConverter.GetBytes(gameData.SpentMoney));
                     break;
+                case 0x710E: // Netto de Tennis does this
                 case 0x7C01:
                     client.SetState(new MainMenuState(server, client));
                     break;

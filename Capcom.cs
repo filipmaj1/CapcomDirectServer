@@ -53,6 +53,7 @@ namespace FMaj.CapcomDirectServer
             SendEnterRoom       = 0x7301,
             SendExitRoom        = 0x7302,
             SendRoomCount       = 0x7004,
+            SendChangeGenre     = 0x7005,
             SendRoomInfo        = 0x7401,
             SendChatMessage     = 0x7B01,
 
@@ -92,6 +93,7 @@ namespace FMaj.CapcomDirectServer
             EnterRoom           = 0x6301,
             ExitRoom            = 0x6302,
             SendRoomCount       = 0x6004,
+            ChangeRoomGenre     = 0x6005,
             SendRoomInfo        = 0x6401,
             UpdateRoomAccess    = 0x6402,
             UpdateRoomInfo      = 0x6403,
@@ -115,7 +117,8 @@ namespace FMaj.CapcomDirectServer
             SendBattleCode              = 0x6702,
             SendModemMessage            = 0x6703,
             
-            ChatMessage                 = 0x6B01
+            ChatMessage                 = 0x6B01,
+            NetDeTennisUnknown = 0x6005
         }
 
         public enum SearchResult

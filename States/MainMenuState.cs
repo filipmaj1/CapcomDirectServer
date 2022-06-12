@@ -57,6 +57,12 @@ namespace FMaj.CapcomDirectServer.States
                             client.SendMessage(ServerOpcodes.SearchMatchMakingResult, writer.WriteByte((byte)SearchResult.UserIsNotOnline1).Finish());
                         break;
                     }
+                // Changing "Room Genres". This client exits the room list state, fires this, then enters again. Graphically doesn't change.
+                case 0x7005:
+                    {
+                        client.SendMessage(Capcom.ServerOpcodes.ChangeRoomGenre, writer.WriteByte(1).WriteByte(1).WriteByte(1).WriteByte(1).Finish());
+                        break;
+                    }
             }
         }
 
