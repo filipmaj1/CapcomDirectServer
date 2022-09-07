@@ -51,7 +51,7 @@ namespace FMaj.CapcomDirectServer.States
                 case 0x7401:
                     {
                         ushort roomNumber = reader.ReadUInt16();
-                        Room room = server.GetRoom(client.gameCode, roomNumber);
+                        Room room = server.GetRoom(client.gameCode, client.currentGenre, roomNumber);
                         if (room == null)
                         {
                             client.Disconnect();
@@ -64,7 +64,7 @@ namespace FMaj.CapcomDirectServer.States
                 case 0x7403:
                     {
                         ushort roomNumber = reader.ReadUInt16();
-                        Room room = server.GetRoom(client.gameCode, roomNumber);
+                        Room room = server.GetRoom(client.gameCode, client.currentGenre, roomNumber);
                         if (room == null)
                         {
                             client.Disconnect();
@@ -83,7 +83,7 @@ namespace FMaj.CapcomDirectServer.States
                 // Started Matchmaking (Chatroom)
                 case 0x7501:
                     {
-                        Room room = server.GetRoom(client.gameCode, roomNumber);
+                        Room room = server.GetRoom(client.gameCode, client.currentGenre, roomNumber);
                         client.SetState(new MatchMakingState(server, client, MatchMakingScope.Chatroom, room));
                         break;
                     }

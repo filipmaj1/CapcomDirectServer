@@ -31,6 +31,7 @@ namespace FMaj.CapcomDirectServer
         private ClientState currentState;
         private Room currentRoom = null;
         private Client opponent = null;
+        public byte currentGenre = 0x00;
 
         public Client(Server server, Socket socket)
         {
@@ -180,7 +181,7 @@ namespace FMaj.CapcomDirectServer
             if (currentRoom != null)
                 currentRoom.Remove(this);
 
-            Room room = serverReference.GetRoom(gameCode, roomNumber);
+            Room room = serverReference.GetRoom(gameCode, currentGenre, roomNumber);
             room.Add(this);
             currentRoom = room;
         }
@@ -259,6 +260,11 @@ namespace FMaj.CapcomDirectServer
 
             if (currentState != null)
                 currentState.DoPacket(opcode, data);
-        }               
+        }          
+        
+        public void setCurrentGenre(byte toSet)
+        {
+            this.currentGenre = toSet;
+        }
     }
 }

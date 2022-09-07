@@ -78,5 +78,18 @@ namespace FMaj.CapcomDirectServer
                 player2.VsSideResult(player2Side);
             }
         }
+
+        public string getSide2PhoneNumber()
+        {
+            if (player1Side == SIDE2)
+            {
+                return player1.capcom.TelephoneNumber;
+            }
+            else if (player2Side == SIDE2)
+            {
+                return player2.capcom.TelephoneNumber;
+            }
+            else return null;
+        }
     }
 }

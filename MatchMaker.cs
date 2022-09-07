@@ -16,6 +16,7 @@ namespace FMaj.CapcomDirectServer
             public readonly Client client;
             public readonly MatchMakingScope scope;
             public readonly byte gameCode;
+            public readonly byte genreCode;
             public readonly Room room;
             public readonly long joinTime;
 
@@ -24,6 +25,7 @@ namespace FMaj.CapcomDirectServer
                 this.client = client;
                 this.scope = scope;
                 this.gameCode = gameCode;
+                this.genreCode = client.currentGenre;
                 this.room = room;
                 this.joinTime = joinTime;
             }
@@ -83,11 +85,11 @@ namespace FMaj.CapcomDirectServer
                     if (entry.scope == MatchMakingScope.Any)
                     {
                         otherEntry = currentlyMatchMaking.FirstOrDefault(otherEntry => !entry.Equals(otherEntry) && (otherEntry.scope == MatchMakingScope.Any ||
-                            (otherEntry.scope == MatchMakingScope.Ranked && Math.Abs(entry.client.gameData.Rank - otherEntry.client.gameData.Rank) <= 3)));                        
+                            (otherEntry.scope == MatchMakingScope.Ranked && Math.Abs(entry.client.gameData.Rank - otherEntry.client.gameData.Rank) <= 3)) && entry.genreCode == otherEntry.genreCode);                        
                     }
                     else if (entry.scope == MatchMakingScope.Ranked)
                     {
-                        otherEntry = currentlyMatchMaking.FirstOrDefault(otherEntry => !entry.Equals(otherEntry) && (otherEntry.scope == MatchMakingScope.Ranked && Math.Abs(entry.client.gameData.Rank - otherEntry.client.gameData.Rank) <= 3));
+                        otherEntry = currentlyMatchMaking.FirstOrDefault(otherEntry => !entry.Equals(otherEntry) && (otherEntry.scope == MatchMakingScope.Ranked && Math.Abs(entry.client.gameData.Rank - otherEntry.client.gameData.Rank) <= 3) && entry.genreCode == otherEntry.genreCode);
                     }
                     else
                     {

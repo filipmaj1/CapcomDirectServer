@@ -40,7 +40,8 @@ namespace FMaj.CapcomDirectServer.States
                     client.SendMessage(ServerOpcodes.SetUserWinLose, writer.WriteUInt16(gameData.Wins).WriteUInt16(gameData.Losses).WriteUInt16(gameData.Draws).Finish());
                     break;
                 case 0x7204:
-                    client.SendMessage(ServerOpcodes.SetUserRanking, writer.WriteUInt16(gameData.Ranking).WriteUInt16(200).Finish());
+
+                    client.SendMessage(ServerOpcodes.SetUserRanking, writer.WriteUInt16(gameData.Ranking).WriteUInt16(Database.getTotalUsersForRanking(client.gameCode)).Finish());
                     break;
                 case 0x7206:
                     client.SendMessage(ServerOpcodes.SetUserMoney, writer.WriteUInt32(gameData.SpentMoney).Finish());
@@ -73,6 +74,9 @@ namespace FMaj.CapcomDirectServer.States
                     msgBytes2[1] = 0x80;
                     Array.Copy(blah, 0, msgBytes2, 2, 0x80);
                     client.SendMessage(ServerOpcodes.SetUserMessage, msgBytes2);
+                    break;
+                case 0x720B:
+                    client.SendMessage(ServerOpcodes.Unk620B, writer.WriteByte(0x00).Finish());
                     break;
                 case 0x7E01:
                     client.SendMessage(ServerOpcodes.SetUserMoney, BitConverter.GetBytes(gameData.SpentMoney));

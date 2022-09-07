@@ -48,6 +48,7 @@ namespace FMaj.CapcomDirectServer
             GetUserMoney        = 0x7206,
             GetUserTime         = 0x7207,
             GetUserMessage      = 0x720A,
+            Unk720B             = 0x720B,
 
             SendEnterRoomList   = 0x7001,
             SendEnterRoom       = 0x7301,
@@ -88,6 +89,7 @@ namespace FMaj.CapcomDirectServer
             SetUserMoney        = 0x6206,
             SetUserTime         = 0x6207,
             SetUserMessage      = 0x620A,
+            Unk620B             = 0x620B,
             
             EnterRoomList       = 0x6001,
             EnterRoom           = 0x6301,
@@ -117,8 +119,7 @@ namespace FMaj.CapcomDirectServer
             SendBattleCode              = 0x6702,
             SendModemMessage            = 0x6703,
             
-            ChatMessage                 = 0x6B01,
-            NetDeTennisUnknown = 0x6005
+            ChatMessage                 = 0x6B01
         }
 
         public enum SearchResult

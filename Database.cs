@@ -71,10 +71,11 @@ namespace FMaj.CapcomDirectServer
                     while (Reader.Read())
                     {
                         byte gameCode = Reader.GetByte("gamecode");
+                        byte genreCode = Reader.GetByte("genrecode");
                         ushort number = Reader.GetUInt16("number");
                         string name = Reader.GetString("name");
                         ushort maxUsers = Reader.GetUInt16("maxUsers");
-                        rooms.Add(new Room(gameCode, number, name, maxUsers));
+                        rooms.Add(new Room(gameCode, genreCode, number, name, maxUsers));
                     }
                 }
                 catch (MySqlException e)
@@ -371,6 +372,67 @@ namespace FMaj.CapcomDirectServer
             }
 
             return null;
+        }
+
+        public static void storeUserIP(string capcomId, Client client)
+        {
+            MySqlCommand cmd;
+
+            using (MySqlConnection conn = new MySqlConnection(String.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", HOST, PORT, DB_NAME, USERNAME, PASSWORD)))
+            {
+                try
+                {
+                    conn.Open();
+                    string query = @"
+                                INSERT INTO dialplanservice (capcomId, phonenumber, currentIP) 
+                                VALUES (@capcomIDs, (SELECT telephone FROM accounts WHERE capcomId=@capcomIDs), @currentIPs)
+                                ON DUPLICATE KEY UPDATE currentIP=@currentIPs;";
+                    cmd = new MySqlCommand(query, conn);
+                    cmd.Parameters.AddWithValue("@capcomIDs", capcomId);
+                    cmd.Parameters.AddWithValue("@currentIPs", client.GetAddress());
+                    cmd.ExecuteNonQuery();
+                }
+                catch (MySqlException e)
+                {
+                    Program.Log.Error(e.ToString());
+                }
+                finally
+                {
+                    conn.Dispose();
+                }
+            }
+        }
+
+        public static UInt16 getTotalUsersForRanking(byte gameCode)
+        {
+            MySqlCommand cmd;
+
+            using (MySqlConnection conn = new MySqlConnection(String.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", HOST, PORT, DB_NAME, USERNAME, PASSWORD)))
+            {
+                try
+                {
+                    conn.Open();
+                    string query = @"SELECT COUNT(*) FROM gamedata WHERE gamecode=@gameCode;";
+                    cmd = new MySqlCommand(query, conn);
+                    cmd.Parameters.AddWithValue("@gameCode", gameCode);
+                    using MySqlDataReader Reader = cmd.ExecuteReader();
+                    while (Reader.Read())
+                    {
+                        string count = Reader.GetString(0);
+                        return Convert.ToUInt16(count);
+                    }
+                }
+                catch (MySqlException e)
+                {
+                    Program.Log.Error(e.ToString());
+                }
+                finally
+                {
+                    conn.Dispose();
+                }
+            }
+
+            return 0;
         }
     }
 }

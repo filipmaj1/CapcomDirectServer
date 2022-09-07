@@ -39,9 +39,10 @@ namespace FMaj.CapcomDirectServer
             Client fakeClient = new Client(this, null);
             fakeClient.capcom.Id = "123456";
             fakeClient.capcom.Email = "testuser@gmail.com";
-            fakeClient.capcom.TelephoneNumber = "4169671111";
+            fakeClient.capcom.TelephoneNumber = "8598675309";
             fakeClient.capcom.Handle = "TestUser";
             fakeClient.gameCode = 6;
+            fakeClient.currentGenre = 0x00;
             fakeClient.gameData = new GameData(3, 1, 8, 3, 1, 1000, 10);
             connList.Add(fakeClient);
             //fakeClient.JoinRoom(2);
@@ -74,7 +75,7 @@ namespace FMaj.CapcomDirectServer
             Thread.Sleep(PING_INTERVAL * 1000);
             while (pingThreadAlive)
             {
-                Program.Log.Info("Sending ping");
+                Program.Log.Trace("Sending ping");
                 lock (connList)
                 {
                     List<Client> toRemove = new List<Client>();
@@ -310,14 +311,14 @@ namespace FMaj.CapcomDirectServer
             return segaMessage;
         }
 
-        public ushort GetRoomCount(byte gameCode)
+        public ushort GetRoomCount(byte gameCode, byte genreCode)
         {
-            return (ushort) chatRooms.Where(room => room.GameCode == gameCode).Count();
+            return (ushort) chatRooms.Where(room => room.GameCode == gameCode && room.GenreCode == genreCode).Count();
         }
 
-        public Room GetRoom(byte gameCode, ushort roomNum)
+        public Room GetRoom(byte gameCode, byte genreCode, ushort roomNum)
         {
-            return chatRooms.FirstOrDefault(room => room.GameCode == gameCode && room.RoomNumber == roomNum);
+            return chatRooms.FirstOrDefault(room => room.GameCode == gameCode && room.GenreCode == genreCode && room.RoomNumber == roomNum);
         }
 
         public Client FindClientByID(string capcomID)

@@ -60,7 +60,17 @@ namespace FMaj.CapcomDirectServer.States
                 // Changing "Room Genres". This client exits the room list state, fires this, then enters again. Graphically doesn't change.
                 case 0x7005:
                     {
+                        byte newGenre = reader.ReadByte();
+                        client.setCurrentGenre(newGenre);
                         client.SendMessage(Capcom.ServerOpcodes.ChangeRoomGenre, writer.WriteByte(1).WriteByte(1).WriteByte(1).WriteByte(1).Finish());
+                        break;
+                    }
+                case 0x710E:
+                    {
+                        if (client.gameCode == (byte)GameCodes.NettoDeTennis) break;
+                        reader.ReadByte();//Skip first byte
+                        byte subGameParam = reader.ReadByte();
+                        //client.setCurrentGenre(subGameParam);
                         break;
                     }
             }

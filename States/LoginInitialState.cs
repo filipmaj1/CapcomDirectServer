@@ -40,9 +40,15 @@ namespace FMaj.CapcomDirectServer.States
                     capcomID = Encoding.GetEncoding("shift_jis").GetString(data, 0, 6);
                     loginType = data[6];
                     if (loginType == '%' || loginType == '*')
+                    {
+                        Database.storeUserIP(capcomID, client);
                         client.SetState(new LoginUserCreateOrUpdateState(server, client, capcomID, loginType));
+                    }
                     else if (loginType == '#')
+                    {
+                        Database.storeUserIP(capcomID, client);
                         client.SetState(new LoginPostBattleState(server, client, capcomID));
+                    }
                     else
                         client.Disconnect();
                     break;

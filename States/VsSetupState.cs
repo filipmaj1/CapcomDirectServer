@@ -63,12 +63,37 @@ namespace FMaj.CapcomDirectServer.States
                 case 0x7507:
                     client.SendMessage(ServerOpcodes.Unknown1, writer.WriteByte(1).Finish());
                     break;
-                case 0x7606:
-                    client.SendMessage(ServerOpcodes.Unknown2, writer.WriteString("atdt1234567").Finish());
-                    break;
-                case 0x7703:
-                    client.SendMessage(ServerOpcodes.SendModemMessage, writer.WriteString("atdt1234567").Finish());
-                    break;                    
+                case 0x7606: //Calling and waiting side recieve.
+                    {
+                        //dreamPiKillPacket();
+                        client.SendMessage(ServerOpcodes.Unknown2, writer.WriteString("atdt1234567").Finish());
+                        break;
+                    }
+                case 0x7703: // Only calling side recieves (Side 1)
+                    {
+                        dreamPiKillPacket();
+                        client.SendMessage(ServerOpcodes.SendModemMessage, writer.WriteString("atdt" + battle.getSide2PhoneNumber()).Finish());
+
+                        break;
+                    }
+            }
+        }
+
+        private void dreamPiKillPacket()
+        {
+            //DreamPi PPP Kill Packet
+            try
+            {
+                System.Net.Sockets.TcpClient killPacketClient = new System.Net.Sockets.TcpClient(client.GetAddress().Split(":")[0], 65433);
+                Byte[] killPacketData = System.Text.Encoding.ASCII.GetBytes("ppp_kill");
+                System.Net.Sockets.NetworkStream killPacketStream = killPacketClient.GetStream();
+                killPacketStream.Write(killPacketData, 0, killPacketData.Length);
+                killPacketStream.Close();
+                killPacketClient.Close();
+            }
+            catch (System.Net.Sockets.SocketException e)
+            {
+                Program.Log.Error("SocketException: {0}", e);
             }
         }
 
