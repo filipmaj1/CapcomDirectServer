@@ -32,7 +32,7 @@ namespace FMaj.CapcomDirectServer.States
         {
         }
 
-        public override void DoPacket(ushort opcode, byte[] data)
+        public override bool DoPacket(ushort opcode, byte[] data)
         {
             using MemoryStream memStream = new MemoryStream(data);
             using BinaryReader reader = new BinaryReader(memStream);
@@ -45,7 +45,7 @@ namespace FMaj.CapcomDirectServer.States
                         client.LeaveRoom();
                         client.SendMessage(ServerOpcodes.ExitRoom, writer.WriteByte(1).Finish());
                         client.SetState(new RoomListState(server, client));
-                        break;
+                        return true;
                     }
                 // Room Info Request
                 case 0x7401:
@@ -55,10 +55,10 @@ namespace FMaj.CapcomDirectServer.States
                         if (room == null)
                         {
                             client.Disconnect();
-                            return;
+                            return true;
                         }
                         client.SendMessage(ServerOpcodes.SendRoomInfo, writer.WriteUInt16(room.RoomNumber).WriteByte(room.IsAvailable()).WriteUInt16(room.Count).WriteString(room.RoomName).Finish());
-                        break;
+                        return true;
                     }
                 // Room Info Request
                 case 0x7403:
@@ -68,24 +68,24 @@ namespace FMaj.CapcomDirectServer.States
                         if (room == null)
                         {
                             client.Disconnect();
-                            return;
+                            return true;
                         }
 
                         client.SendMessage(ServerOpcodes.UpdateRoomInfo, writer.WriteUInt16(room.RoomNumber).WriteByte(room.IsAvailable()).WriteUInt16(room.Count).Finish());
-                        break;
+                        return true;
                     }
                 // Sent Message
                 case 0x7B01:
                     {
                         client.MessageRoom(data);
-                        break;
+                        return true;
                     }
                 // Started Matchmaking (Chatroom)
                 case 0x7501:
                     {
                         Room room = server.GetRoom(client.gameCode, roomNumber);
                         client.SetState(new MatchMakingState(server, client, MatchMakingScope.Chatroom, room));
-                        break;
+                        return true;
                     }
                 // Entered search and started search
                 case 0x7505:
@@ -104,8 +104,9 @@ namespace FMaj.CapcomDirectServer.States
                         }
                         else
                             client.SendMessage(ServerOpcodes.SearchMatchMakingResult, writer.WriteByte((byte)SearchResult.UserIsNotOnline1).Finish());
-                        break;
+                        return true;
                     }
+                default: return false;
             }
         }
 

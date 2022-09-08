@@ -23,7 +23,7 @@ namespace FMaj.CapcomDirectServer.States
 
         public override void OnExitState() { }
 
-        public override void DoPacket(ushort opcode, byte[] data)
+        public override bool DoPacket(ushort opcode, byte[] data)
         {
             switch (opcode)
             {
@@ -31,11 +31,11 @@ namespace FMaj.CapcomDirectServer.States
                     individualID = new byte[data.Length];
                     Array.Copy(data, individualID, data.Length);
                     client.SetIndividualID(individualID);
-                    break;
+                    return true;
                 case 0x7102:
                     gameCode = data[0];
                     client.SetGameCode(gameCode);
-                    break;
+                    return true;
                 case 0x7106:
                     capcomID = Encoding.GetEncoding("shift_jis").GetString(data, 0, 6);
                     loginType = data[6];
@@ -45,7 +45,8 @@ namespace FMaj.CapcomDirectServer.States
                         client.SetState(new LoginPostBattleState(server, client, capcomID));
                     else
                         client.Disconnect();
-                    break;
+                    return true;
+                default: return false;
             }
         }
         public override string ToString()

@@ -21,10 +21,11 @@ namespace FMaj.CapcomDirectServer
             CapcomVsSNK_Pro     = 8,
             Jojo                = 9,
             ProjectJustice      = 10,
-            SFIIX_SPFIIX        = 11,
+            StreetFighterIIX    = 11,
             TechRomancer        = 12,
             TaisenNetGimmick    = 13,
-            HeavyMetal          = 14
+            HeavyMetal          = 14,
+            PuzzleFighterIIX    = 15
         }
 
         public enum ClientOpcodes
@@ -48,6 +49,7 @@ namespace FMaj.CapcomDirectServer
             GetUserMoney        = 0x7206,
             GetUserTime         = 0x7207,
             GetUserMessage      = 0x720A,
+            GetUserRankingB     = 0x720B,
 
             SendEnterRoomList   = 0x7001,
             SendEnterRoom       = 0x7301,
@@ -58,7 +60,10 @@ namespace FMaj.CapcomDirectServer
             SendChatMessage     = 0x7B01,
 
             EnterMainMenu       = 0x7C01,
-            SendConnectResponse = 0x7E01
+            SendConnectResponse = 0x7E01,
+
+            UnkTechromancer1    = 0x3107,
+            UnkTechromancer2    = 0x3102,
         }
 
         public enum ServerOpcodes
@@ -88,7 +93,8 @@ namespace FMaj.CapcomDirectServer
             SetUserMoney        = 0x6206,
             SetUserTime         = 0x6207,
             SetUserMessage      = 0x620A,
-            
+            SetUserRankingB     = 0x620B,
+
             EnterRoomList       = 0x6001,
             EnterRoom           = 0x6301,
             ExitRoom            = 0x6302,
@@ -118,7 +124,10 @@ namespace FMaj.CapcomDirectServer
             SendModemMessage            = 0x6703,
             
             ChatMessage                 = 0x6B01,
-            NetDeTennisUnknown = 0x6005
+
+            UnkNettoDeTennis            = 0x6005,
+            UnkTechromancer1            = 0x2107,
+            UnkTechromancer2            = 0x2102,
         }
 
         public enum SearchResult

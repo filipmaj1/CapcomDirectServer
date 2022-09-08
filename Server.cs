@@ -41,12 +41,12 @@ namespace FMaj.CapcomDirectServer
             fakeClient.capcom.Email = "testuser@gmail.com";
             fakeClient.capcom.TelephoneNumber = "4169671111";
             fakeClient.capcom.Handle = "TestUser";
-            fakeClient.gameCode = 6;
+            fakeClient.gameCode = 7;
             fakeClient.gameData = new GameData(3, 1, 8, 3, 1, 1000, 10);
             connList.Add(fakeClient);
             //fakeClient.JoinRoom(2);
             //fakeClient.SetState(new MatchMakingState(this, fakeClient, Capcom.MatchMakingScope.Chatroom, GetRoom(6, 2)));
-            fakeClient.SetState(new MatchMakingState(this, fakeClient, Capcom.MatchMakingScope.Any));
+            fakeClient.SetState(new MatchMakingState(this, fakeClient, Capcom.MatchMakingScope.Any, GetRoom(7, 1)));
         }
 
         public void Shutdown()
@@ -74,7 +74,7 @@ namespace FMaj.CapcomDirectServer
             Thread.Sleep(PING_INTERVAL * 1000);
             while (pingThreadAlive)
             {
-                Program.Log.Info("Sending ping");
+                //Program.Log.Info("Sending ping");
                 lock (connList)
                 {
                     List<Client> toRemove = new List<Client>();
@@ -211,8 +211,6 @@ namespace FMaj.CapcomDirectServer
                     scanner += size;
 
                     ushort opcode = (ushort) (opcodeHI << 8 | opcodeLO);
-
-                    Program.Log.Debug(String.Format("Receiving ({0:X}, {1:X}):\n", opcode, size) + Server.ByteArrayToHex(data));
 
                     conn.ProcessPacket(opcode, data);
                 }

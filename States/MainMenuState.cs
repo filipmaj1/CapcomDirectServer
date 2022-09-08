@@ -19,7 +19,7 @@ namespace FMaj.CapcomDirectServer.States
         {
         }
 
-        public override void DoPacket(ushort opcode, byte[] data)
+        public override bool DoPacket(ushort opcode, byte[] data)
         {
             using MemoryStream memStream = new MemoryStream(data);
             using BinaryReader reader = new BinaryReader(memStream);
@@ -29,15 +29,15 @@ namespace FMaj.CapcomDirectServer.States
                 // Enter Battle Room
                 case 0x7001:
                     client.SetState(new RoomListState(server, client));
-                    break;
+                    return true;
                 // Enter Unranked Matchmaking
                 case 0x7502:
                     client.SetState(new MatchMakingState(server, client, MatchMakingScope.Any));
-                    break;
+                    return true;
                 // Enter Beginner (Ranked) Matchmaking
                 case 0x7503:
                     client.SetState(new MatchMakingState(server, client, MatchMakingScope.Ranked));
-                    break;
+                    return true;
                 // Entered search menu and started search
                 case 0x7505:
                     {
@@ -55,14 +55,15 @@ namespace FMaj.CapcomDirectServer.States
                         }
                         else
                             client.SendMessage(ServerOpcodes.SearchMatchMakingResult, writer.WriteByte((byte)SearchResult.UserIsNotOnline1).Finish());
-                        break;
+                        return true;
                     }
                 // Changing "Room Genres". This client exits the room list state, fires this, then enters again. Graphically doesn't change.
                 case 0x7005:
                     {
                         client.SendMessage(Capcom.ServerOpcodes.ChangeRoomGenre, writer.WriteByte(1).WriteByte(1).WriteByte(1).WriteByte(1).Finish());
-                        break;
+                        return true;
                     }
+                default: return false;
             }
         }
 

@@ -25,17 +25,18 @@ namespace FMaj.CapcomDirectServer.States
         {
         }
 
-        public override void DoPacket(ushort opcode, byte[] data)
+        public override bool DoPacket(ushort opcode, byte[] data)
         {
             switch (opcode)
             {
                 case 0x7103:
                     battleCode = Encoding.ASCII.GetString(data, 0, 14);
                     client.SendMessage(ServerOpcodes.GetBattleData);
-                    break;
+                    return true;
                 case 0x710A:
                     client.SetState(new LoginSendUserDataState(server, client));
-                    break;
+                    return true;
+                default: return false;
             }
         }
     }

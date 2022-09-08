@@ -50,7 +50,7 @@ namespace FMaj.CapcomDirectServer.States
             }
         }
 
-        public override void DoPacket(ushort opcode, byte[] data)
+        public override bool DoPacket(ushort opcode, byte[] data)
         {
             using MemoryStream memStream = new MemoryStream(data);
             using BinaryReader reader = new BinaryReader(memStream);
@@ -65,14 +65,15 @@ namespace FMaj.CapcomDirectServer.States
                             client.SetState(new ChatRoomState(server, client, chatroom.RoomNumber, true));
                         else
                             client.SetState(new MainMenuState(server, client));
-                        break;
+                        return true;
                     }
                 // Sent Message (Chatroom Scope)
                 case 0x7B01:
                     {
                         client.MessageRoom(data);
-                        break;
+                        return true;
                     }
+                default: return false;
             }
         }
 
