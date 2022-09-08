@@ -58,7 +58,7 @@ CREATE TABLE IF NOT EXISTS `gamedata` (
   `wins` smallint(5) unsigned NOT NULL DEFAULT '0',
   `losses` smallint(5) unsigned NOT NULL DEFAULT '0',
   `draws` smallint(5) unsigned NOT NULL DEFAULT '0',
-  `rank` tinyint(3) unsigned NOT NULL DEFAULT '10',
+  `rank` tinyint(3) unsigned NOT NULL DEFAULT '11',
   `ranking` smallint(5) unsigned NOT NULL DEFAULT '2000',
   `playtime` mediumint(8) unsigned NOT NULL DEFAULT '0',
   `moneyUsed` mediumint(8) unsigned NOT NULL DEFAULT '0',
