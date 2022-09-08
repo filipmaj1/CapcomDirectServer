@@ -64,10 +64,10 @@ namespace FMaj.CapcomDirectServer.States
                     client.SendMessage(ServerOpcodes.Unknown1, writer.WriteByte(1).Finish());
                     return true;
                 case 0x7606:
-                    client.SendMessage(ServerOpcodes.Unknown2, writer.WriteString("atdt6474038390").Finish());
+                    client.SendMessage(ServerOpcodes.Unknown2, writer.WriteString("atdt1234567").Finish());
                     return true;
                 case 0x7703:
-                    client.SendMessage(ServerOpcodes.SendModemMessage, writer.WriteString("atdt6474038390").Finish());
+                    client.SendMessage(ServerOpcodes.SendModemMessage, writer.WriteString("atdt1234567").Finish());
                     return true;
                 default: return false;
             }
@@ -76,7 +76,7 @@ namespace FMaj.CapcomDirectServer.States
         public void VsSideResult(byte side)
         {
             using PacketWriter writer = new PacketWriter();
-            client.SendMessage(ServerOpcodes.SendModemDirection, writer.WriteByte(2).Finish());
+            client.SendMessage(ServerOpcodes.SendModemDirection, writer.WriteByte(side).Finish());
         }
 
         public override string ToString()
