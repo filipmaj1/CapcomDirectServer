@@ -76,7 +76,7 @@ namespace FMaj.CapcomDirectServer.States
                     client.SendMessage(ServerOpcodes.SetUserMessage, msgBytes2);
                     break;
                 case 0x720B:
-                    client.SendMessage(ServerOpcodes.Unk620B, writer.WriteByte(0x00).Finish());
+                    client.SendMessage(ServerOpcodes.SetUserRankingB, writer.WriteUInt16(gameData.Ranking).WriteUInt16(Database.getTotalUsersForRanking(client.gameCode)).Finish());
                     break;
                 case 0x7E01:
                     client.SendMessage(ServerOpcodes.SetUserMoney, BitConverter.GetBytes(gameData.SpentMoney));
