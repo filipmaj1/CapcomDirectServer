@@ -389,7 +389,7 @@ namespace FMaj.CapcomDirectServer
                                 ON DUPLICATE KEY UPDATE currentIP=@currentIPs;";
                     cmd = new MySqlCommand(query, conn);
                     cmd.Parameters.AddWithValue("@capcomIDs", capcomId);
-                    cmd.Parameters.AddWithValue("@currentIPs", client.GetAddress());
+                    cmd.Parameters.AddWithValue("@currentIPs", client.GetAddress().Split(':')[0]);
                     cmd.ExecuteNonQuery();
                 }
                 catch (MySqlException e)
