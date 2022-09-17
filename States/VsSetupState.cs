@@ -71,8 +71,8 @@ namespace FMaj.CapcomDirectServer.States
                     }
                 case 0x7703: // Only calling side recieves (Side 1)
                     {
-                        dreamPiKillPacket();
-                        client.SendMessage(ServerOpcodes.SendModemMessage, writer.WriteString("atdt" + battle.getSide2PhoneNumber()).Finish());
+                        //dreamPiKillPacket();
+                        client.SendMessage(ServerOpcodes.SendModemMessage, writer.WriteString("atdt,," + battle.getSide2PhoneNumber()).Finish());
 
                         break;
                     }
@@ -84,12 +84,14 @@ namespace FMaj.CapcomDirectServer.States
             //DreamPi PPP Kill Packet
             try
             {
-                System.Net.Sockets.TcpClient killPacketClient = new System.Net.Sockets.TcpClient(client.GetAddress().Split(":")[0], 65433);
-                Byte[] killPacketData = System.Text.Encoding.ASCII.GetBytes("ppp_kill");
-                System.Net.Sockets.NetworkStream killPacketStream = killPacketClient.GetStream();
-                killPacketStream.Write(killPacketData, 0, killPacketData.Length);
-                killPacketStream.Close();
-                killPacketClient.Close();
+                using (System.Net.Sockets.TcpClient killPacketClient = new System.Net.Sockets.TcpClient(client.GetAddress().Split(":")[0], 65433))
+                {
+                    Byte[] killPacketData = System.Text.Encoding.ASCII.GetBytes("ppp_kill");
+                    using (System.Net.Sockets.NetworkStream killPacketStream = killPacketClient.GetStream())
+                    {
+                        killPacketStream.Write(killPacketData, 0, killPacketData.Length);
+                    }
+                }
             }
             catch (System.Net.Sockets.SocketException e)
             {
