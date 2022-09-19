@@ -156,7 +156,7 @@ namespace FMaj.CapcomDirectServer
                     address=@address, 
                     age=@age, 
                     profession=@profession
-                    WHERE id = @capcomID
+                    WHERE capcomId = @capcomID
                     ";
 
                 cmd = new MySqlCommand(query, conn);
