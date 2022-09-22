@@ -26,7 +26,7 @@ namespace FMaj.CapcomDirectServer.States
             
         }
 
-        public override void DoPacket(ushort opcode, byte[] data)
+        public override bool DoPacket(ushort opcode, byte[] data)
         {
             using MemoryStream memStream = new MemoryStream(data);
             using BinaryReader reader = new BinaryReader(memStream);
@@ -35,25 +35,24 @@ namespace FMaj.CapcomDirectServer.States
             {
                 case 0x7202:
                     client.SendMessage(ServerOpcodes.SetUserRank, writer.WriteByte(gameData.Rank).Finish());
-                    break;
+                    return true;
                 case 0x7203:
                     client.SendMessage(ServerOpcodes.SetUserWinLose, writer.WriteUInt16(gameData.Wins).WriteUInt16(gameData.Losses).WriteUInt16(gameData.Draws).Finish());
-                    break;
+                    return true;
                 case 0x7204:
-
                     client.SendMessage(ServerOpcodes.SetUserRanking, writer.WriteUInt16(gameData.Ranking).WriteUInt16(Database.getTotalUsersForRanking(client.gameCode)).Finish());
-                    break;
+                    return true;
                 case 0x7206:
                     client.SendMessage(ServerOpcodes.SetUserMoney, writer.WriteUInt32(gameData.SpentMoney).Finish());
-                    break;
+                    return true;
                 case 0x7207:
                     client.SendMessage(ServerOpcodes.SetUserTime, writer.WriteUInt32(gameData.PlayTime).Finish());
-                    break;
+                    return true;
                 case 0x7205:
                     {
                         string segaMessage = server.GetSegaMessage();
                         client.SendMessage(Capcom.ServerOpcodes.SetSegaMessage, writer.WriteString(segaMessage).Finish());
-                        break;
+                        return true;
                     }
                 case 0x720A:
                     if (data[0] > 3)
@@ -74,17 +73,24 @@ namespace FMaj.CapcomDirectServer.States
                     msgBytes2[1] = 0x80;
                     Array.Copy(blah, 0, msgBytes2, 2, 0x80);
                     client.SendMessage(ServerOpcodes.SetUserMessage, msgBytes2);
-                    break;
+                    return true;
                 case 0x720B:
                     client.SendMessage(ServerOpcodes.SetUserRankingB, writer.WriteUInt16(gameData.Ranking).WriteUInt16(Database.getTotalUsersForRanking(client.gameCode)).Finish());
-                    break;
+                    return true;
                 case 0x7E01:
                     client.SendMessage(ServerOpcodes.SetUserMoney, BitConverter.GetBytes(gameData.SpentMoney));
-                    break;
+                    return true;
+                case 0x3107: // Techromancer does this
+                    client.SendMessage(ServerOpcodes.UnkTechromancer1, writer.WriteString("Test Techromancer").Finish());
+                    return true;
+                case 0x3102: // Techromancer does this
+                    client.SendMessage(ServerOpcodes.UnkTechromancer2, writer.WriteByte(1).WriteByte(1).Finish());
+                    return true;
                 case 0x710E: // Netto de Tennis does this
                 case 0x7C01:
                     client.SetState(new MainMenuState(server, client));
-                    break;
+                    return true;
+                default: return false;
             }
         }
 

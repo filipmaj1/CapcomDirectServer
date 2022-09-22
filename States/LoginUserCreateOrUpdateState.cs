@@ -39,17 +39,20 @@ namespace FMaj.CapcomDirectServer.States
             
         }
 
-        public override void DoPacket(ushort opcode, byte[] data)
+        public override bool DoPacket(ushort opcode, byte[] data)
         {
+            bool handledPacket = false;
             switch (opcode)
             {
                 case 0x7107:
                     capcomInfo.Handle = Encoding.GetEncoding("shift_jis").GetString(data, 1, data[0]);
                     loginFlags |= LOGIN_USER_HANDLE;
+                    handledPacket = true;
                     break;
                 case 0x7108:
                     capcomInfo.Email = Encoding.GetEncoding("shift_jis").GetString(data, 1, data[0]);
                     loginFlags |= LOGIN_EMAIL;
+                    handledPacket = true;
                     break;
                 case 0x7109:
                     // Client adds '5' to every byte for "S E C U R I T Y" /eyeroll
@@ -58,10 +61,12 @@ namespace FMaj.CapcomDirectServer.States
 
                     capcomInfo.TelephoneNumber = Encoding.GetEncoding("shift_jis").GetString(data, 1, data[0]);
                     loginFlags |= LOGIN_TELEPHONE;
+                    handledPacket = true;
                     break;
                 case 0x710C:
                     profile = UserProfile.Parse(data);
                     loginFlags |= LOGIN_USER_PROFILE;
+                    handledPacket = true;
                     break;
             }
 
@@ -70,6 +75,8 @@ namespace FMaj.CapcomDirectServer.States
                 client.RegisterOrUpdateUser(loginType, capcomInfo, profile);
                 client.SetState(new LoginSendUserDataState(server, client));
             }
+
+            return handledPacket;
         }
 
         public override string ToString()

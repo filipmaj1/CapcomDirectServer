@@ -25,7 +25,7 @@ namespace FMaj.CapcomDirectServer.States
         {
         }
 
-        public override void DoPacket(ushort opcode, byte[] data)
+        public override bool DoPacket(ushort opcode, byte[] data)
         {
             using MemoryStream memStream = new MemoryStream(data);
             using BinaryReader reader = new BinaryReader(memStream);
@@ -39,63 +39,41 @@ namespace FMaj.CapcomDirectServer.States
                         client.LeaveRoom();
                         client.SendMessage(ServerOpcodes.ExitRoom, writer.WriteByte(1).Finish());
                         client.SetState(new RoomListState(server, client));
-                        break;
+                        return true;
                     }
                 case 0x7601:
                     client.SendMessage(ServerOpcodes.SendOpponentUserId, writer.WriteCapcomID(opponent.capcom.Id).Finish());
-                    break;
+                    return true;
                 case 0x7602:
                     client.SendMessage(ServerOpcodes.SendOpponentHandle, writer.WriteString(opponent.capcom.Handle).Finish());
-                    break;
+                    return true;
                 case 0x7603:
                     client.SendMessage(ServerOpcodes.SendOpponentRank, writer.WriteByte(opponent.gameData.Rank).Finish());
-                    break;
+                    return true;
                 case 0x7604:
                     client.SendMessage(ServerOpcodes.SendOpponentWinLose, writer.WriteUInt16(opponent.gameData.Wins).WriteUInt16(opponent.gameData.Losses).WriteUInt16(opponent.gameData.Draws).Finish());
-                    break;                    
+                    return true;                    
                 case 0x7701:
                     byte sideChosen = reader.ReadByte();
                     battle.SetSide(client, sideChosen);
-                    break;
+                    return true;
                 case 0x7702:
                     client.SendMessage(ServerOpcodes.SendBattleCode, writer.WriteBattleCode(battle.BattleCode).Finish());
-                    break;
+                    return true;
                 case 0x7507:
                     client.SendMessage(ServerOpcodes.Unknown1, writer.WriteByte(1).Finish());
-                    break;
+                    return true;
                 case 0x7606: //Calling and waiting side recieve.
                     {
-                        //dreamPiKillPacket();
                         client.SendMessage(ServerOpcodes.Unknown2, writer.WriteString("atdt1234567").Finish());
-                        break;
+                        return true;
                     }
                 case 0x7703: // Only calling side recieves (Side 1)
                     {
-                        //dreamPiKillPacket();
                         client.SendMessage(ServerOpcodes.SendModemMessage, writer.WriteString("atdt,," + battle.getSide2PhoneNumber()).Finish());
-                        break;
+                        return true;
                     }
-            }
-        }
-
-        [System.Obsolete("No longer needed", true)]
-        private void dreamPiKillPacket()
-        {
-            //DreamPi PPP Kill Packet
-            try
-            {
-                using (System.Net.Sockets.TcpClient killPacketClient = new System.Net.Sockets.TcpClient(client.GetAddress().Split(":")[0], 65433))
-                {
-                    Byte[] killPacketData = System.Text.Encoding.ASCII.GetBytes("ppp_kill");
-                    using (System.Net.Sockets.NetworkStream killPacketStream = killPacketClient.GetStream())
-                    {
-                        killPacketStream.Write(killPacketData, 0, killPacketData.Length);
-                    }
-                }
-            }
-            catch (System.Net.Sockets.SocketException e)
-            {
-                Program.Log.Error("SocketException: {0}", e);
+                default: return false;
             }
         }
 

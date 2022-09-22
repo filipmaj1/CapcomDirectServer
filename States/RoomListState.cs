@@ -24,7 +24,7 @@ namespace FMaj.CapcomDirectServer.States
             client.SendMessage(Capcom.ServerOpcodes.EnterRoomList, writer.WriteByte(1).WriteByte(0).Finish());
         }
 
-        public override void DoPacket(ushort opcode, byte[] data)
+        public override bool DoPacket(ushort opcode, byte[] data)
         {
             using MemoryStream memStream = new MemoryStream(data);
             using BinaryReader reader = new BinaryReader(memStream);
@@ -33,18 +33,18 @@ namespace FMaj.CapcomDirectServer.States
             {
                 case 0x7002: //Leaving Room List
                     client.SetState(new MainMenuState(server, client));
-                    break;
-                case 0x7004: //Leaving
+                    return true;
+                case 0x7004:
                     {
                         ushort roomCount = server.GetRoomCount(client.gameCode, client.currentGenre);
                         client.SendMessage(Capcom.ServerOpcodes.SendRoomCount, writer.WriteByte(1).WriteByte(1).WriteUInt16(roomCount).Finish());
-                        break;
+                        return true;
                     }
                 case 0x7301: //Entering Chat Room
                     {                        
                         ushort roomNumber = reader.ReadUInt16();
                         client.SetState(new ChatRoomState(server, client, roomNumber));
-                        break;
+                        return true;
                     }
                 case 0x7401: //Get Room Info
                     {
@@ -53,11 +53,12 @@ namespace FMaj.CapcomDirectServer.States
                         if (room == null)
                         {
                             client.Disconnect();
-                            return;
+                            return true;
                         }
                         client.SendMessage(Capcom.ServerOpcodes.SendRoomInfo, writer.WriteUInt16(room.RoomNumber).WriteByte(room.IsAvailable()).WriteUInt16(room.Count).WriteString(room.RoomName).Finish());
-                        break;
-                    }                
+                        return true;
+                    }
+                default: return false;
             }
         }
 

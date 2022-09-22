@@ -77,7 +77,7 @@ namespace FMaj.CapcomDirectServer
             Thread.Sleep(PING_INTERVAL * 1000);
             while (pingThreadAlive)
             {
-                Program.Log.Trace("Sending ping");
+                //Program.Log.Trace("Sending ping");
                 //Program.Log.Debug("There are {0} connections in the list.", connList.Count);
                 lock (connList)
                 {
@@ -225,8 +225,6 @@ namespace FMaj.CapcomDirectServer
                     scanner += size;
 
                     ushort opcode = (ushort) (opcodeHI << 8 | opcodeLO);
-
-                    Program.Log.Debug(String.Format("Receiving ({0:X}, {1:X}):\n", opcode, size) + Server.ByteArrayToHex(data));
 
                     conn.ProcessPacket(opcode, data);
                 }

@@ -38,7 +38,7 @@ namespace FMaj.CapcomDirectServer.States
             client.endLoginTimeout();
         }
 
-        public override void DoPacket(ushort opcode, byte[] data)
+        public override bool DoPacket(ushort opcode, byte[] data)
         {
             switch (opcode)
             {
@@ -46,11 +46,11 @@ namespace FMaj.CapcomDirectServer.States
                     individualID = new byte[data.Length];
                     Array.Copy(data, individualID, data.Length);
                     client.SetIndividualID(individualID);
-                    break;
+                    return true;
                 case 0x7102:
                     gameCode = data[0];
                     client.SetGameCode(gameCode);
-                    break;
+                    return true;
                 case 0x7106:
                     capcomID = Encoding.GetEncoding("shift_jis").GetString(data, 0, 6);
                     loginType = data[6];
@@ -65,11 +65,11 @@ namespace FMaj.CapcomDirectServer.States
                     }
                     else
                         client.Disconnect();
-                    break;
+                    return true;
                 default: //Maybe this will stop portscanners from screwing us
                     Program.Log.Info("{0} did not send a known opcode during login. Maybe it's a portscanner?", (client.socket.RemoteEndPoint as IPEndPoint).Address);
                     client.Disconnect(false);
-                    break;
+                    return false;
             }
         }
         public override string ToString()

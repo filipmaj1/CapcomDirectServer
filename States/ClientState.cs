@@ -17,6 +17,6 @@ namespace FMaj.CapcomDirectServer.States
 
         public abstract void OnEnterState();
         public abstract void OnExitState();
-        public abstract void DoPacket(ushort opcode, byte[] data);
+        public abstract bool DoPacket(ushort opcode, byte[] data);
     }
 }

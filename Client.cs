@@ -270,7 +270,12 @@ namespace FMaj.CapcomDirectServer
             }
 
             if (currentState != null)
-                currentState.DoPacket(opcode, data);
+            {
+                if (currentState.DoPacket(opcode, data))
+                    return;
+            }
+
+            Program.Log.Debug(String.Format("Receiving unknown packet: ({0:X}):\n", opcode) + Server.ByteArrayToHex(data));
         }          
         
         public void setCurrentGenre(byte toSet)
@@ -286,7 +291,6 @@ namespace FMaj.CapcomDirectServer
                 loginTimeoutTimer.Dispose();
                 loginTimeoutTimer = null;
             }
-            
         }
     }
 }
