@@ -67,7 +67,7 @@ namespace FMaj.CapcomDirectServer.States
                     }
                 case 0x710E:
                     {
-                        if (client.gameCode == (byte)GameCodes.NettoDeTennis) break;
+                        if (client.gameCode == (byte)GameCodes.NettoDeTennis) return true;
                         reader.ReadByte();//Skip first byte
                         byte subGameParam = reader.ReadByte();
                         //client.setCurrentGenre(subGameParam);
