@@ -7,6 +7,7 @@ namespace FMaj.CapcomDirectServer
     class Room
     {
         public byte GameCode { get; }
+        public byte GenreCode { get; }
         public ushort RoomNumber { get; }
         public string RoomName { get; set; }
         public ushort MaxUsers { get; }
@@ -14,9 +15,10 @@ namespace FMaj.CapcomDirectServer
 
         private List<Client> members = new List<Client>();
         
-        public Room(byte gamecode, ushort roomNumber, string roomName, ushort maxUsers)
+        public Room(byte gamecode, byte genrecode, ushort roomNumber, string roomName, ushort maxUsers)
         {
             this.GameCode = gamecode;
+            this.GenreCode = genrecode;
             this.RoomNumber = roomNumber;
             this.RoomName = roomName;
             this.MaxUsers = maxUsers;

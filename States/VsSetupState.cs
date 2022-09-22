@@ -63,12 +63,16 @@ namespace FMaj.CapcomDirectServer.States
                 case 0x7507:
                     client.SendMessage(ServerOpcodes.Unknown1, writer.WriteByte(1).Finish());
                     return true;
-                case 0x7606:
-                    client.SendMessage(ServerOpcodes.Unknown2, writer.WriteString("atdt1234567").Finish());
-                    return true;
-                case 0x7703:
-                    client.SendMessage(ServerOpcodes.SendModemMessage, writer.WriteString("atdt1234567").Finish());
-                    return true;
+                case 0x7606: //Calling and waiting side recieve.
+                    {
+                        client.SendMessage(ServerOpcodes.Unknown2, writer.WriteString("atdt1234567").Finish());
+                        return true;
+                    }
+                case 0x7703: // Only calling side recieves (Side 1)
+                    {
+                        client.SendMessage(ServerOpcodes.SendModemMessage, writer.WriteString("atdt,," + battle.getSide2PhoneNumber()).Finish());
+                        return true;
+                    }
                 default: return false;
             }
         }

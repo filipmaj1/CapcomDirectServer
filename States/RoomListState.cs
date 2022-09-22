@@ -31,25 +31,25 @@ namespace FMaj.CapcomDirectServer.States
             using PacketWriter writer = new PacketWriter();
             switch (opcode)
             {
-                case 0x7002:
+                case 0x7002: //Leaving Room List
                     client.SetState(new MainMenuState(server, client));
                     return true;
                 case 0x7004:
                     {
-                        ushort roomCount = server.GetRoomCount(client.gameCode);
+                        ushort roomCount = server.GetRoomCount(client.gameCode, client.currentGenre);
                         client.SendMessage(Capcom.ServerOpcodes.SendRoomCount, writer.WriteByte(1).WriteByte(1).WriteUInt16(roomCount).Finish());
                         return true;
                     }
-                case 0x7301:
+                case 0x7301: //Entering Chat Room
                     {                        
                         ushort roomNumber = reader.ReadUInt16();
                         client.SetState(new ChatRoomState(server, client, roomNumber));
                         return true;
                     }
-                case 0x7401:
+                case 0x7401: //Get Room Info
                     {
                         ushort roomNumber = reader.ReadUInt16();
-                        Room room = server.GetRoom(client.gameCode, roomNumber);
+                        Room room = server.GetRoom(client.gameCode, client.currentGenre, roomNumber);
                         if (room == null)
                         {
                             client.Disconnect();

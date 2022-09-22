@@ -28,6 +28,8 @@ namespace FMaj.CapcomDirectServer
         private List<Room> chatRooms;
         private MatchMaker matchMaker;
 
+        private List<IPAddress> bannedIPs = new List<IPAddress>();
+
         public Server()
         {
             chatRooms = Database.LoadRooms();
@@ -39,14 +41,15 @@ namespace FMaj.CapcomDirectServer
             Client fakeClient = new Client(this, null);
             fakeClient.capcom.Id = "123456";
             fakeClient.capcom.Email = "testuser@gmail.com";
-            fakeClient.capcom.TelephoneNumber = "4169671111";
+            fakeClient.capcom.TelephoneNumber = "8598675309";
             fakeClient.capcom.Handle = "TestUser";
-            fakeClient.gameCode = 7;
+            fakeClient.gameCode = 6;
+            fakeClient.currentGenre = 0x00;
             fakeClient.gameData = new GameData(3, 1, 8, 3, 1, 1000, 10);
-            connList.Add(fakeClient);
+            //connList.Add(fakeClient);
             //fakeClient.JoinRoom(2);
             //fakeClient.SetState(new MatchMakingState(this, fakeClient, Capcom.MatchMakingScope.Chatroom, GetRoom(6, 2)));
-            fakeClient.SetState(new MatchMakingState(this, fakeClient, Capcom.MatchMakingScope.Any, GetRoom(7, 1)));
+            //fakeClient.SetState(new MatchMakingState(this, fakeClient, Capcom.MatchMakingScope.Any));
         }
 
         public void Shutdown()
@@ -74,7 +77,8 @@ namespace FMaj.CapcomDirectServer
             Thread.Sleep(PING_INTERVAL * 1000);
             while (pingThreadAlive)
             {
-                //Program.Log.Info("Sending ping");
+                //Program.Log.Trace("Sending ping");
+                //Program.Log.Debug("There are {0} connections in the list.", connList.Count);
                 lock (connList)
                 {
                     List<Client> toRemove = new List<Client>();
@@ -148,10 +152,20 @@ namespace FMaj.CapcomDirectServer
         private void AcceptCallback(IAsyncResult result)
         {
             Client conn = null;
+            
             try
             {
                 System.Net.Sockets.Socket s = (System.Net.Sockets.Socket)result.AsyncState;
                 conn = new Client(this, s.EndAccept(result));
+
+                Program.Log.Debug("AcceptCallback coming from {0}:{1}", (conn.socket.RemoteEndPoint as IPEndPoint).Address, (conn.socket.RemoteEndPoint as IPEndPoint).Port);
+
+                if(bannedIPs.Contains((conn.socket.RemoteEndPoint as IPEndPoint).Address))
+                {
+                    conn.Disconnect(false);
+                    conn = null;
+                    return;
+                }
 
                 lock (connList)
                 {
@@ -175,7 +189,7 @@ namespace FMaj.CapcomDirectServer
                         connList.Remove(conn);
                     }
                 }
-                serverSocket.BeginAccept(new AsyncCallback(AcceptCallback), serverSocket);
+                //serverSocket.BeginAccept(new AsyncCallback(AcceptCallback), serverSocket);
             }
             catch (ObjectDisposedException)
             {
@@ -233,6 +247,11 @@ namespace FMaj.CapcomDirectServer
                         connList.Remove(conn);
                     }
                 }
+            }
+            catch(ObjectDisposedException)
+            {
+                conn.endLoginTimeout();
+                Program.Log.Info("{0} has disconnected.", conn.capcom.Id);
             }
         }
 
@@ -308,14 +327,14 @@ namespace FMaj.CapcomDirectServer
             return segaMessage;
         }
 
-        public ushort GetRoomCount(byte gameCode)
+        public ushort GetRoomCount(byte gameCode, byte genreCode)
         {
-            return (ushort) chatRooms.Where(room => room.GameCode == gameCode).Count();
+            return (ushort) chatRooms.Where(room => room.GameCode == gameCode && room.GenreCode == genreCode).Count();
         }
 
-        public Room GetRoom(byte gameCode, ushort roomNum)
+        public Room GetRoom(byte gameCode, byte genreCode, ushort roomNum)
         {
-            return chatRooms.FirstOrDefault(room => room.GameCode == gameCode && room.RoomNumber == roomNum);
+            return chatRooms.FirstOrDefault(room => room.GameCode == gameCode && room.GenreCode == genreCode && room.RoomNumber == roomNum);
         }
 
         public Client FindClientByID(string capcomID)
@@ -350,5 +369,27 @@ namespace FMaj.CapcomDirectServer
             return matchMaker;
         }
 
+        public void removeFromConnList(Client toRemove)
+        {
+            if(connList.Contains(toRemove))
+            {
+                lock (connList)
+                {
+                    connList.Remove(toRemove);
+                }
+            }
+        }
+
+        public void banIP(IPAddress toBan)
+        {
+            Program.Log.Debug("Banning {0}...", toBan.ToString());
+            bannedIPs.Add(toBan);
+            foreach(Client thisConn in connList)
+            {
+                if((thisConn.socket.RemoteEndPoint as IPEndPoint).Address == toBan) {
+                    thisConn.Disconnect(false);
+                }
+            }
+        }
     }
 }

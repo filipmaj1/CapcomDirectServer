@@ -42,6 +42,14 @@ CREATE TABLE IF NOT EXISTS `battles` (
   PRIMARY KEY (`battlecode`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
+CREATE TABLE `dialplanservice` (
+	`capcomId` VARCHAR(6) NOT NULL,
+	`phonenumber` VARCHAR(128) NULL DEFAULT NULL,
+	`currentIP` VARCHAR(15) NOT NULL,
+	`insertedAt` DATETIME NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+	PRIMARY KEY (`capcomId`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
 -- Data exporting was unselected.
 -- Dumping structure for table capcomkddi.gamedata
 CREATE TABLE IF NOT EXISTS `gamedata` (
@@ -50,7 +58,7 @@ CREATE TABLE IF NOT EXISTS `gamedata` (
   `wins` smallint(5) unsigned NOT NULL DEFAULT '0',
   `losses` smallint(5) unsigned NOT NULL DEFAULT '0',
   `draws` smallint(5) unsigned NOT NULL DEFAULT '0',
-  `rank` tinyint(3) unsigned NOT NULL DEFAULT '10',
+  `rank` tinyint(3) unsigned NOT NULL DEFAULT '11',
   `ranking` smallint(5) unsigned NOT NULL DEFAULT '2000',
   `playtime` mediumint(8) unsigned NOT NULL DEFAULT '0',
   `moneyUsed` mediumint(8) unsigned NOT NULL DEFAULT '0',
@@ -61,10 +69,11 @@ CREATE TABLE IF NOT EXISTS `gamedata` (
 -- Dumping structure for table capcomkddi.rooms
 CREATE TABLE IF NOT EXISTS `rooms` (
   `gamecode` tinyint(3) unsigned NOT NULL,
+  `genrecode` TINYINT(3) unsigned NOT NULL DEFAULT '0',
   `number` smallint(5) unsigned NOT NULL,
   `name` varchar(128) CHARACTER SET sjis DEFAULT NULL,
   `maxUsers` smallint(5) unsigned DEFAULT '50',
-  PRIMARY KEY (`gamecode`,`number`)
+  PRIMARY KEY (`gamecode`,`number`, `genrecode`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- Data exporting was unselected.
