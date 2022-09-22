@@ -33,6 +33,8 @@ namespace FMaj.CapcomDirectServer
         private Client opponent = null;
         public byte currentGenre = 0x00;
 
+        public System.Timers.Timer loginTimeoutTimer = null;
+
         public Client(Server server, Socket socket)
         {
             this.serverReference = server;
@@ -143,14 +145,15 @@ namespace FMaj.CapcomDirectServer
             SetState(new MainMenuState(serverReference, this));
         }
 
-        public void Disconnect()
+        public void Disconnect(bool sendShutdown = true)
         {
             if (socket == null)
                 return;
 
-            SendMessage(ServerOpcodes.Shutdown);
+            if (sendShutdown) { SendMessage(ServerOpcodes.Shutdown); }
             socket.Shutdown(SocketShutdown.Both);
             socket.Close();
+            serverReference.removeFromConnList(this);
         }
 
         public override string ToString()
@@ -256,6 +259,14 @@ namespace FMaj.CapcomDirectServer
                         SetState(new MainMenuState(serverReference, this));
                         return;
                     }
+                case 0x7F01: //When client gracefully disconnects.
+                    {
+                        Program.Log.Info("{0} is disconnecting.", this.capcom.Id);
+                        socket.Shutdown(SocketShutdown.Both);
+                        socket.Close();
+                        serverReference.removeFromConnList(this);
+                        return;
+                    }
             }
 
             if (currentState != null)
@@ -265,6 +276,17 @@ namespace FMaj.CapcomDirectServer
         public void setCurrentGenre(byte toSet)
         {
             this.currentGenre = toSet;
+        }
+
+        public void endLoginTimeout()
+        {
+            if(loginTimeoutTimer != null)
+            {
+                loginTimeoutTimer.Stop();
+                loginTimeoutTimer.Dispose();
+                loginTimeoutTimer = null;
+            }
+            
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net;
 using MySql.Data.MySqlClient;
 
 namespace FMaj.CapcomDirectServer
@@ -376,6 +377,7 @@ namespace FMaj.CapcomDirectServer
 
         public static void storeUserIP(string capcomId, Client client)
         {
+            Program.Log.Debug("Attempting to add " + capcomId + " to the dail plan via " + (client.socket.RemoteEndPoint as IPEndPoint).Address);
             MySqlCommand cmd;
 
             using (MySqlConnection conn = new MySqlConnection(String.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", HOST, PORT, DB_NAME, USERNAME, PASSWORD)))
@@ -389,8 +391,10 @@ namespace FMaj.CapcomDirectServer
                                 ON DUPLICATE KEY UPDATE currentIP=@currentIPs;";
                     cmd = new MySqlCommand(query, conn);
                     cmd.Parameters.AddWithValue("@capcomIDs", capcomId);
-                    cmd.Parameters.AddWithValue("@currentIPs", client.GetAddress().Split(':')[0]);
+                    cmd.Parameters.AddWithValue("@currentIPs", (client.socket.RemoteEndPoint as IPEndPoint).Address);
+                    
                     cmd.ExecuteNonQuery();
+                    Program.Log.Debug("Added " + capcomId + " to the dial plan.");
                 }
                 catch (MySqlException e)
                 {

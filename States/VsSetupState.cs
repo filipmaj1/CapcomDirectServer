@@ -73,12 +73,12 @@ namespace FMaj.CapcomDirectServer.States
                     {
                         //dreamPiKillPacket();
                         client.SendMessage(ServerOpcodes.SendModemMessage, writer.WriteString("atdt,," + battle.getSide2PhoneNumber()).Finish());
-
                         break;
                     }
             }
         }
 
+        [System.Obsolete("No longer needed", true)]
         private void dreamPiKillPacket()
         {
             //DreamPi PPP Kill Packet

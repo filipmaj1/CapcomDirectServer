@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Text;
+using System.Timers;
 using static FMaj.CapcomDirectServer.Capcom;
 
 namespace FMaj.CapcomDirectServer.States
@@ -19,9 +21,22 @@ namespace FMaj.CapcomDirectServer.States
             client.SendMessage(ServerOpcodes.GetIndividualID);
             client.SendMessage(ServerOpcodes.GetGameCode);
             client.SendMessage(ServerOpcodes.GetUserId);
+
+            client.loginTimeoutTimer = new System.Timers.Timer(120000);
+            client.loginTimeoutTimer.Elapsed += (s, e) =>
+            {
+                Program.Log.Info("{0}:{1} did not finish login after two minutes. Disconnecting...", (client.socket.RemoteEndPoint as IPEndPoint).Address, (client.socket.RemoteEndPoint as IPEndPoint).Port);
+                server.banIP((client.socket.RemoteEndPoint as IPEndPoint).Address);
+                client.Disconnect(false);
+                client.endLoginTimeout();
+            };
+            client.loginTimeoutTimer.Start();
         }
 
-        public override void OnExitState() { }
+        public override void OnExitState() 
+        {
+            client.endLoginTimeout();
+        }
 
         public override void DoPacket(ushort opcode, byte[] data)
         {
@@ -39,18 +54,21 @@ namespace FMaj.CapcomDirectServer.States
                 case 0x7106:
                     capcomID = Encoding.GetEncoding("shift_jis").GetString(data, 0, 6);
                     loginType = data[6];
+                    Database.storeUserIP(capcomID, client);
                     if (loginType == '%' || loginType == '*')
                     {
-                        Database.storeUserIP(capcomID, client);
                         client.SetState(new LoginUserCreateOrUpdateState(server, client, capcomID, loginType));
                     }
                     else if (loginType == '#')
                     {
-                        Database.storeUserIP(capcomID, client);
                         client.SetState(new LoginPostBattleState(server, client, capcomID));
                     }
                     else
                         client.Disconnect();
+                    break;
+                default: //Maybe this will stop portscanners from screwing us
+                    Program.Log.Info("{0} did not send a known opcode during login. Maybe it's a portscanner?", (client.socket.RemoteEndPoint as IPEndPoint).Address);
+                    client.Disconnect(false);
                     break;
             }
         }
